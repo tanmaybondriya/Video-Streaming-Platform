@@ -1,6 +1,13 @@
 import axios from "axios";
 import useUsers from "@/hooks/useUsers";
+import { GetServerSidePropsContext } from "next";
+import { requireAuth } from "@/lib/withAuth";
 
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const redirect = await requireAuth(context, "super_admin");
+  if (redirect) return redirect;
+  return { props: {} };
+}
 export default function AdminDashboard() {
   const { data: users = [], mutate } = useUsers();
 

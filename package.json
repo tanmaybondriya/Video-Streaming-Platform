@@ -18,6 +18,8 @@
     "axios": "^1.15.2",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.4.2",
+    "fluent-ffmpeg": "^2.1.3",
+    "formidable": "^3.5.4",
     "lodash": "^4.18.1",
     "next": "16.2.4",
     "next-auth": "^4.24.14",
@@ -31,6 +33,8 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/bcrypt": "^6.0.0",
+    "@types/fluent-ffmpeg": "^2.1.28",
+    "@types/formidable": "^3.5.1",
     "@types/lodash": "^4.17.24",
     "@types/node": "^20.19.39",
     "@types/pg": "^8.20.0",

@@ -1,33 +1,31 @@
-import { useRouter } from "next/router";
-import { AiOutlineArrowLeft } from "react-icons/ai";
-import useMovie from "@/hooks/useMovie";
+import { NextApiRequest, NextApiResponse } from "next";
+import prismadb from "@/lib/prismadb";
+import serverAuth from "@/lib/serverAuth";
 
-const Watch = () => {
-  const router = useRouter();
-  const { movieId } = router.query;
-  const { data: movie } = useMovie(movieId as string);
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  try {
+    await serverAuth(req, res);
 
-  return (
-    <div className="h-screen w-screen bg-black">
-      <nav className="fixed w-full p-4 z-10 flex flex-row items-center gap-8 bg-black bg-opacity-70">
-        <AiOutlineArrowLeft
-          onClick={() => router.push("/")}
-          size={40}
-          className="text-white cursor-pointer hover:opacity-80 transition"
-        />
-        <p className="text-white text-xl md:text-3xl font-bold">
-          <span className="font-light mr-2">Watching:</span>
-          {movie?.title}
-        </p>
-      </nav>
-      <video
-        className="h-full w-full"
-        autoPlay
-        controls
-        src={movie?.videoUrl}
-      />
-    </div>
-  );
-};
+    const { movieId } = req.query;
 
-export default Watch;
+    if (typeof movieId !== "string") {
+      throw new Error("Invalid movie ID");
+    }
+
+    const movie = await prismadb.movie.findUnique({
+      where: { id: movieId },
+    });
+
+    if (!movie) {
+      throw new Error("Movie not found");
+    }
+
+    return res.status(200).json(movie);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({ error: "Something went wrong" });
+  }
+}

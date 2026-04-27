@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "mongodb"
-  // url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 model User {
   id             String    @id @default(auto()) @map("_id") @db.ObjectId
@@ -19,6 +19,7 @@ model User {
   sessions       Session[]
   accounts       Account[]
   role           String    @default("USER")
+  profiles       Profile[] 
 }
 
 model Account {
@@ -67,4 +68,22 @@ model Movie {
   genre        String
   duration     String
   uploadedBy   String? @db.ObjectId
+  language     String @default("English")
+  type         String @default("movie") 
+  releaseYear  Int    @default(2023)
+  video480p    String? // converted versions
+  video720p    String?
+  video1080p   String?
+}
+
+model Profile {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  name      String
+  image     String   @default("/images/default-blue.png")
+  favoriteIds String[] @db.ObjectId
+  watchedIds  String[] @db.ObjectId
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

@@ -5,6 +5,7 @@ import NavbarItem from "./NavbarItem";
 import MobileMenu from "./MobileMenu";
 import AccountMenu from "./AccountMenu";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import useCurrentProfile from "@/hooks/useCurrentProfile";
 
 const TOP_OFFSET = 66;
 
@@ -27,6 +28,7 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+  const { currentProfile } = useCurrentProfile();
 
   const toggleMobileMenu = useCallback(() => {
     setShowMobileMenu((current) => !current);
@@ -47,25 +49,35 @@ const Navbar = () => {
         <img
           src="/images/Logo.png"
           alt="Logo"
-          className="h-4 lg:h-7 cursor-pointer"
+          className="h-4 lg:h-15 cursor-pointer"
           onClick={() => router.push("/")}
         />
 
         {/* Desktop Menu */}
         <div className="flex-row ml-8 gap-7 hidden lg:flex">
           <NavbarItem label="Home" onClick={() => router.push("/")} />
-          <NavbarItem label="Series" />
-          <NavbarItem label="Films" />  
-          <NavbarItem label="New & Popular" />
-          <NavbarItem label="My List" />
-          <NavbarItem label="Browse by Languages" />
+          <NavbarItem label="Series" onClick={() => router.push("/series")} />
+          <NavbarItem label="Films" onClick={() => router.push("/films")} />
+          <NavbarItem
+            label="New & Popular"
+            onClick={() => router.push("/new")}
+          />
+          <NavbarItem label="My List" onClick={() => router.push("/mylist")} />
+          <NavbarItem
+            label="Browse by Languages"
+            onClick={() => router.push("/browse")}
+          />
           {currentUser?.role === "super_admin" && (
             <NavbarItem label="Admin" onClick={() => router.push("/admin")} />
           )}
-          {["video_provider", "super_admin"].includes(currentUser?.role) && (
+          {(currentUser?.role === "video_provider" ||
+            currentUser?.role === "super_admin") && (
             <NavbarItem
               label="Provider"
-              onClick={() => router.push("/provider")}
+              onClick={() => {
+                console.log("clicked!");
+                router.push("/provider");
+              }}
             />
           )}
         </div>
@@ -95,7 +107,10 @@ const Navbar = () => {
             className="flex flex-row items-center gap-2 cursor-pointer relative"
           >
             <div className="w-6 h-6 lg:w-10 lg:h-10 rounded-md overflow-hidden">
-              <img src="/images/default-blue.png" alt="Profile" />
+              <img
+                src={currentProfile?.image || "/images/default-blue.png"}
+                alt="Profile"
+              />
             </div>
             <BsChevronDown
               className={`text-white transition ${showAccountMenu ? "rotate-180" : "rotate-0"}`}

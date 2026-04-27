@@ -46,9 +46,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ data }) => {
               />
             </div>
           </div>
-          <p className="text-green-400 font-semibold mt-4">
-            New <span className="text-white">2023</span>
-          </p>
+          <p className="text-white font-semibold mt-2">{data.title}</p>
           <div className="flex flex-row mt-4 gap-2 items-center">
             <p className="text-white text-[10px] lg:text-sm">{data.duration}</p>
           </div>

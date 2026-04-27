@@ -9,7 +9,15 @@ export default async function handler(
   try {
     await serverAuth(req, res);
 
-    const movies = await prismadb.movie.findMany();
+    const { type, language, sortBy } = req.query;
+
+    const movies = await prismadb.movie.findMany({
+      where: {
+        ...(type ? { type: type as string } : {}),
+        ...(language ? { language: language as string } : {}),
+      },
+      orderBy: sortBy === "latest" ? { releaseYear: "desc" } : undefined,
+    });
 
     return res.status(200).json(movies);
   } catch (err) {

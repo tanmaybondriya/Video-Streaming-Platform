@@ -4,14 +4,46 @@ import prismadb from "@/lib/prismadb";
 import { compare } from "bcrypt";
 import GithubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 export const authOptions: AuthOptions = {
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account }) {
+      if (account?.provider !== "credentials") {
+        const existingUser = await prismadb.user.findUnique({
+          where: { email: user.email! },
+        });
+        if (!existingUser) {
+          await prismadb.user.create({
+            data: {
+              email: user.email!,
+              name: user.name!,
+              image: user.image!,
+              role: "user",
+              emailVerified: new Date(),
+            },
+          });
+        }
+      }
+      return true;
+    },
+    async jwt({ token, user, account, trigger }) {
       if (user) {
+        token.id = user.id;
         token.role = (user as any).role;
       }
+
+      // always fetch fresh role from DB on every token refresh
+      if (token.email) {
+        const dbUser = await prismadb.user.findUnique({
+          where: { email: token.email },
+          select: { id: true, role: true },
+        });
+        if (dbUser) {
+          token.id = dbUser.id;
+          token.role = dbUser.role;
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
@@ -62,7 +94,6 @@ export const authOptions: AuthOptions = {
     signIn: "/auth",
   },
   debug: process.env.NODE_ENV === "development",
-  adapter: PrismaAdapter(prismadb),
   session: {
     strategy: "jwt",
   },
