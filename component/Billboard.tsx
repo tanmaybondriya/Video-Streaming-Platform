@@ -36,7 +36,7 @@ const Billboard = () => {
           </button>
           <button
             onClick={() => openModal(movie?.id)}
-            className="bg-white bg-opacity-30 text-white py-1 md:py-2 px-2 md:px-4 w-auto text-xs lg:text-lg font-semibold flex flex-row items-center gap-1 rounded-md hover:bg-opacity-20 transition"
+            className="bg-white bg-opacity-30 text-black py-1 md:py-2 px-2 md:px-4 w-auto text-xs lg:text-lg font-semibold flex flex-row items-center gap-1 rounded-md hover:bg-opacity-20 transition"
           >
             <AiOutlineInfoCircle size={24} />
             More Info

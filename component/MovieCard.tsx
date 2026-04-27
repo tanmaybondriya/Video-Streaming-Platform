@@ -1,6 +1,5 @@
 import { useRouter } from "next/router";
 import { BsFillPlayFill, BsChevronDown } from "react-icons/bs";
-import { useCallback } from "react";
 import FavoriteButton from "./FavoriteButton";
 import useInfoModal from "@/hooks/useInfoModal";
 
@@ -11,7 +10,20 @@ interface MovieCardProps {
 const MovieCard: React.FC<MovieCardProps> = ({ data }) => {
   const router = useRouter();
   const { openModal } = useInfoModal();
-
+  const savedProgress =
+    typeof window !== "undefined"
+      ? localStorage.getItem(`watch-progress-${data.id}`)
+      : null;
+  const totalDuration = data.duration ? parseInt(data.duration) * 60 : 0;
+  const progressPercent =
+    savedProgress && totalDuration
+      ? Math.min((Number(savedProgress) / totalDuration) * 100, 100)
+      : 0;
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
   return (
     <div className="group bg-zinc-900 col-span relative h-[12vw]">
       <img
@@ -53,6 +65,19 @@ const MovieCard: React.FC<MovieCardProps> = ({ data }) => {
           <div className="flex flex-row mt-4 gap-2 items-center">
             <p className="text-white text-[10px] lg:text-sm">{data.genre}</p>
           </div>
+          {progressPercent > 0 && (
+            <div className="mt-2">
+              <div className="bg-zinc-600 rounded-full h-1">
+                <div
+                  className="bg-red-600 h-1 rounded-full"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+              <p className="text-gray-400 text-xs mt-1">
+                {formatTime(Number(savedProgress))} watched
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

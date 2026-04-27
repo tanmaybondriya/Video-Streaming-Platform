@@ -39,7 +39,7 @@ export default function ProfilePage() {
 
   const handleAddProfile = async () => {
     if (!newName.trim()) return;
-    await axios.post("/api/profiles", { name: newName, image: newImage });
+    await axios.post("/api/profile", { name: newName, image: newImage });
     mutate();
     setShowAdd(false);
     setNewName("");
@@ -47,13 +47,13 @@ export default function ProfilePage() {
 
   const handleDeleteProfile = async (e: any, profileId: string) => {
     e.stopPropagation();
-    await axios.delete("/api/profiles", { data: { profileId } });
+    await axios.delete("/api/profile", { data: { profileId } });
     mutate();
   };
 
   const handleEditProfile = async () => {
     if (!editName.trim() || !editingProfile) return;
-    await axios.patch("/api/profiles", {
+    await axios.patch("/api/profile", {
       profileId: editingProfile.id,
       name: editName,
       image: editingProfile.image,

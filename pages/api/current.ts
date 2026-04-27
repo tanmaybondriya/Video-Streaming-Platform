@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { getSession } from "next-auth/react";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "./auth/[...nextauth]";
 import prismadb from "@/lib/prismadb";
 
 export default async function handler(
@@ -7,16 +8,14 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   try {
-    const session = await getSession({ req });
+    const session = await getServerSession(req, res, authOptions);
 
     if (!session?.user?.email) {
       return res.status(401).json({ error: "Not signed in" });
     }
 
     const currentUser = await prismadb.user.findUnique({
-      where: {
-        email: session.user.email,
-      },
+      where: { email: session.user.email },
     });
 
     if (!currentUser) {

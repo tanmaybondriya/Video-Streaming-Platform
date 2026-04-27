@@ -10,6 +10,29 @@ export const config = {
   api: { bodyParser: false },
 };
 
+const generateSprites = (
+  inputPath: string,
+  outputDir: string,
+  baseName: string,
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const spriteDir = path.join(outputDir, `${baseName}_sprites`);
+    if (!fs.existsSync(spriteDir)) fs.mkdirSync(spriteDir, { recursive: true });
+
+    ffmpeg(inputPath)
+      .outputOptions([
+        "-vf",
+        "fps=1/10,scale=160:90", // 1 frame every 10 seconds
+        "-q:v",
+        "5",
+      ])
+      .output(path.join(spriteDir, "thumb_%04d.jpg"))
+      .on("end", () => resolve(`/videos/${baseName}_sprites`))
+      .on("error", (err) => reject(err))
+      .run();
+  });
+};
+
 const convertVideo = (
   inputPath: string,
   outputPath: string,
@@ -75,6 +98,7 @@ export default async function handler(
       const output480 = path.join(uploadDir, `${baseName}_480p.mp4`);
       const output720 = path.join(uploadDir, `${baseName}_720p.mp4`);
       const output1080 = path.join(uploadDir, `${baseName}_1080p.mp4`);
+      const spritePath = await generateSprites(inputPath, uploadDir, baseName);
 
       try {
         await Promise.all([
@@ -104,6 +128,7 @@ export default async function handler(
           video720p: `/videos/${path.basename(output720)}`,
           video1080p: `/videos/${path.basename(output1080)}`,
           uploadedBy: currentUser.id,
+          spritesUrl: spritePath,
         },
       });
 

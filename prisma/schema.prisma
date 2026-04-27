@@ -74,16 +74,50 @@ model Movie {
   video480p    String? // converted versions
   video720p    String?
   video1080p   String?
+  spritesUrl   String?
+  seasons  Season[]
+  episodes Episode[]
 }
 
 model Profile {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
-  name      String
-  image     String   @default("/images/default-blue.png")
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  name        String
+  image       String   @default("/images/default-blue.png")
   favoriteIds String[] @db.ObjectId
   watchedIds  String[] @db.ObjectId
-  createdAt DateTime @default(now())
+  createdAt   DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Season {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  movieId     String    @db.ObjectId
+  number      Int
+  title       String?
+  episodes    Episode[]
+  createdAt   DateTime  @default(now())
+
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+}
+
+model Episode {
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  seasonId     String  @db.ObjectId
+  movieId      String  @db.ObjectId
+  number       Int
+  title        String
+  description  String?
+  videoUrl     String
+  video480p    String?
+  video720p    String?
+  video1080p   String?
+  thumbnailUrl String?
+  duration     String?
+  spritesUrl   String?
+  createdAt    DateTime @default(now())
+
+  season Season @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  movie  Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
 }
